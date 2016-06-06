@@ -19,7 +19,7 @@ import org.apache.http.util.EntityUtils;
 
 public class Internet {
 
-	private String postUrl = "http://10.100.29.2:801/eportal/?c=ACSetting&a=Login&wlanuserip=null&wlanacip=null&wlanacname=null&port=&iTermType=1&mac=000000000000&ip=10.114.208.228&redirect=null&session=null";
+	private String postUrl = "http://10.81.2.6:80";
 	
 	public void Connect() throws ClientProtocolException, IOException{
 		RequestConfig requestConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD_STRICT).build();//标准Cookie策略
@@ -28,6 +28,7 @@ public class Internet {
 		List<NameValuePair> valuePairs = new LinkedList<NameValuePair>();
 		valuePairs.add( new BasicNameValuePair("DDDDD", "21150211099") );
 		valuePairs.add( new BasicNameValuePair("upass", "102857"));
+		valuePairs.add( new BasicNameValuePair("0MKKEY", ""));
 		
 		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(valuePairs, Consts.UTF_8);
 		HttpPost post = new HttpPost(postUrl);
