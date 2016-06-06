@@ -10,6 +10,7 @@ import beans.PersonDaily;
 import database.Database;
 import email.Send;
 import internet.Internet;
+import util.Log;
 
 public class Go {
 
@@ -17,6 +18,7 @@ public class Go {
 		
 		boolean sendTime = false;
 		boolean sendAlready = false;
+		Log log = Log.getInstance();
 		Go go = new Go();
 		SimpleDateFormat format = new SimpleDateFormat("YY.MM.ddE");
 
@@ -24,8 +26,14 @@ public class Go {
 			sendTime = go.sendTime();
 			if( sendTime ){
 				if( !sendAlready){
-					String subject = "ç»¼åˆç»„" + format.format(new Date() ) + "æ—¥æŠ¥";
+					String subject = "×ÛºÏ×é" + format.format(new Date() ) + "ÈÕ±¨";
 					sendAlready = go.run(subject);
+					log.getBuffer().append("send daily report is ");
+					if( sendAlready ){
+						log.getBuffer().append("success!");
+					}else{
+						log.getBuffer().append("fail");
+					}
 				}
 			}else{
 				sendAlready = false;
@@ -55,9 +63,9 @@ public class Go {
 		try{
 			net.Connect();
 			send.setSubject(subject);
-			send.setContent( database.getProjectDaily("ç»¼åˆç»„") );
+			send.setContent( database.getProjectDaily("×ÛºÏ×é") );
 			
-			List<PersonDaily> persons = database.getProjectPerson("ç»¼åˆç»„");
+			List<PersonDaily> persons = database.getProjectPerson("×ÛºÏ×é");
 			for( PersonDaily p : persons ){
 				send.getRecivers().add(p.getEmail());
 			}
