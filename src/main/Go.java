@@ -21,7 +21,7 @@ public class Go {
 		Log log = Log.getInstance();
 		Go go = new Go();
 		SimpleDateFormat format = new SimpleDateFormat("YY.MM.ddE");
-
+		Thread.currentThread().setName("SendDaily");
 		while( true ){
 			sendTime = go.sendTime();
 			if( sendTime ){
