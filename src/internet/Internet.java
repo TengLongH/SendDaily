@@ -1,40 +1,69 @@
 package internet;
 
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.apache.http.Consts;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 
 public class Internet {
 
-	private String postUrl = "http://10.81.2.6:80";
-	
-	public void Connect() throws ClientProtocolException, IOException{
-		RequestConfig requestConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD_STRICT).build();//æ ‡å‡†Cookieç­–ç•¥
-		CloseableHttpClient httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig).build();
-		
-		List<NameValuePair> valuePairs = new LinkedList<NameValuePair>();
-		valuePairs.add( new BasicNameValuePair("DDDDD", "21150211099") );
-		valuePairs.add( new BasicNameValuePair("upass", "102857"));
-		valuePairs.add( new BasicNameValuePair("0MKKEY", ""));
-		
-		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(valuePairs, Consts.UTF_8);
-		HttpPost post = new HttpPost(postUrl);
-        post.setEntity(entity);
-        CloseableHttpResponse postRes = httpClient.execute(post);//ç™»å½•
-        System.out.println(EntityUtils.toString(postRes.getEntity()));
-		postRes.close();
+	private static WebDriver driver;
+	private static StringBuffer script;
+	private static JavascriptExecutor jsexcute;
+	static {
+		System.setProperty("webdriver.firefox.bin", "D:/MyProgram/FF/firefox.exe");
+		script = new StringBuffer();
+		script.append("document.getElementsByName('DDDDD')[0].value='21150211099';");
+		script.append("document.getElementsByName('upass')[0].value='102857';");
+
 	}
+
+	public static void Connect() throws Exception {
+
+		try {
+			driver = new FirefoxDriver();
+			jsexcute = (JavascriptExecutor) driver;
+			driver.get("http://10.81.2.6");
+			if (!driver.getTitle().equals("ÉÏÍø×¢Ïú´°")) {
+				jsexcute.executeScript(script.toString());
+				driver.findElement(By.name("0MKKey")).click();
+			}
+		} catch (Exception e) {
+			throw new Exception("connect internet fail ");
+		}finally{
+			if (null != driver){
+				driver.close();
+			}
+			closeBrowser() ;
+		}
+	}
+
+	public static void disConnect() {
+		
+		try {
+			driver = new FirefoxDriver();
+			jsexcute = (JavascriptExecutor) driver;
+			driver.get("http://10.81.2.6");
+			if (driver.getTitle().equals("ÉÏÍø×¢Ïú´°")) {
+				driver.findElement(By.tagName("input")).click();
+				Alert alert = driver.switchTo().alert();
+				alert.accept();
+			}
+		} catch (Exception e) {
+			
+		}finally{
+			
+			closeBrowser() ;
+		}
+	}
+
+	public static void closeBrowser() {
+		try {
+			Runtime.getRuntime().exec("taskkill /f /im firefox.exe");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 }

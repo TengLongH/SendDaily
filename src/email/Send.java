@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Properties;
 
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -50,7 +49,7 @@ public class Send {
 
 
 	
-	public void send() throws MessagingException{
+	public boolean send() throws Exception{
 		Properties p = new Properties();
 		p.put("mail.smtp.host", host );
 		p.put("mail.smtp.port", port);
@@ -59,25 +58,30 @@ public class Send {
 		
 		Session session = Session.getInstance(p);
 		session.setDebug(true);
-		Transport transport = session.getTransport();
-		transport.connect( host, username, password );
-		
-		MimeMessage message = new MimeMessage( session );
-		message.setFrom( new InternetAddress( sender ));
-		
-		for( String r : recivers ){
-			reciverAddresses.add(new InternetAddress(r) );
+		Transport transport;
+		try {
+			transport = session.getTransport();
+			transport.connect( host, username, password );
+			
+			MimeMessage message = new MimeMessage( session );
+			message.setFrom( new InternetAddress( sender ));
+			
+			for( String r : recivers ){
+				reciverAddresses.add(new InternetAddress(r) );
+			}
+			
+			message.setRecipients(Message.RecipientType.TO, 
+					reciverAddresses.toArray( new InternetAddress[recivers.size()]));
+			
+			message.setSubject( subject );
+			message.setContent( content, "text/html;charset=gbk");
+			
+			transport.sendMessage(message, message.getAllRecipients());
+			transport.close();
+		} catch (Exception e) {
+			throw new Exception("send mail fail");
 		}
-		
-		message.setRecipients(Message.RecipientType.TO, 
-				reciverAddresses.toArray( new InternetAddress[recivers.size()]));
-		
-		message.setSubject( subject );
-		message.setContent( content, "text/html;charset=gbk");
-		
-		transport.sendMessage(message, message.getAllRecipients());
-		transport.close();
-		
+		return true;
 	}
 	
 }

@@ -1,11 +1,8 @@
 package main;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.SimpleFormatter;
-
 import beans.PersonDaily;
 import database.Database;
 import email.Send;
@@ -13,12 +10,13 @@ import internet.Internet;
 import util.Log;
 
 public class Go {
-
+	
+	private static Log log = Log.getInstance();
 	public static void main(String[] args) {
 		
 		boolean sendTime = false;
 		boolean sendAlready = false;
-		Log log = Log.getInstance();
+		
 		Go go = new Go();
 		SimpleDateFormat format = new SimpleDateFormat("YY.MM.ddE");
 		Thread.currentThread().setName("SendDaily");
@@ -48,8 +46,8 @@ public class Go {
 
 	public boolean sendTime( ){
 		Date now = new Date();
-		if( now.getDay() == 1 || now.getDay() == 2 ){
-			Date limit = new Date( now.getYear(), now.getMonth(), now.getDate(), 21, 30 );
+		if( now.getDay() == 3 || now.getDay() == 5 ){
+			Date limit = new Date( now.getYear(), now.getMonth(), now.getDate(), 10, 30 );
 			if( now.compareTo(limit) > 0  )return true;
 			return false;
 		}
@@ -57,11 +55,11 @@ public class Go {
 	}
 	public boolean run( String subject ){
 		
-		Internet net = new Internet();
-		Database database = new Database();
+		boolean success = false;
+		Database database = Database.getInstance();
 		Send send = new Send();
 		try{
-			net.Connect();
+			Internet.Connect();
 			send.setSubject(subject);
 			send.setContent( database.getProjectDaily("×ÛºÏ×é") );
 			
@@ -69,17 +67,17 @@ public class Go {
 			for( PersonDaily p : persons ){
 				send.getRecivers().add(p.getEmail());
 			}
-			
 			send.getRecivers().clear();
 			send.getRecivers().add("1739914236@qq.com");
 			send.getRecivers().add("tenglongh@126.com");
 			send.getRecivers().add("hongtenglong@sohu.com");
-			
-			send.send();
-			return true;
+			success = send.send();
 		}catch( Exception e ){
-			e.printStackTrace();
+			log.getBuffer().append(e.getMessage());
+			log.bufferWrite();
+		}finally{
+			Internet.disConnect();
 		}
-		return false;
+		return success;
 	}
 }

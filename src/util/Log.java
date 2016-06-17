@@ -8,12 +8,12 @@ import java.util.Date;
 public class Log {
 
 	private String filename;
-	public StringBuffer buffer;
+	private StringBuffer buffer;
 	private static Log instance;
 	
 	private Log() {
 		buffer = new StringBuffer();
-		filename = System.getProperty("user.dir") + File.pathSeparator + "log.txt";
+		filename = System.getProperty("user.dir") + File.separator + "log.txt";
 		File file = new File(filename);
 		try {
 			if (!file.exists()) {
@@ -31,6 +31,7 @@ public class Log {
 	}
 	public void bufferWrite(){
 		if( buffer.length() <= 0 )return ;
+		buffer.append("\n");
 		message( buffer.toString() );
 		buffer.delete(0, buffer.length());
 	}

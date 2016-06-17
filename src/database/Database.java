@@ -12,17 +12,11 @@ import beans.PersonDaily;
 public class Database {
 
 	private String username = "sa";
-
 	private String password = "qwe123!@#";
-
-	// private String url =
-	// "jdbc:sqlserver://222.195.150.215:1433; DatabaseName=ReportDatabase; instance=SQL2008R2";
 	private String url = "jdbc:jtds:sqlserver://222.195.150.215:1433;DatabaseName=ReportDatabase;instance=SQL2008R2";
-
-	// private static String driverClass =
-	// "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 	private static String driverClass = "net.sourceforge.jtds.jdbc.Driver";
 
+	private static Database database ;
 	static {
 		try {
 			Class.forName(driverClass);
@@ -31,6 +25,15 @@ public class Database {
 		}
 	}
 
+	private Database(){}
+	
+	public static Database getInstance( ){
+		
+		if( null == database )
+			database = new Database();
+		return database;
+		
+	}
 	public String getProjectDaily(String projectName)
 			throws Exception {
 
@@ -47,8 +50,8 @@ public class Database {
 				throw new Exception("Project name " + " is not exist");
 			}
 			r.close();
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+		}catch (SQLException e1) {
+			throw new Exception("fetch dayily report fail connect database error");
 		}
 		return contents;
 	}
@@ -73,7 +76,8 @@ public class Database {
 			}
 			r.close();
 		} catch (SQLException e1) {
-			e1.printStackTrace();
+			throw new Exception("fetch member email fail connect database error");
+			
 		}
 		return values;
 	}
